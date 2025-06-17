@@ -1,0 +1,24 @@
+@import url('https://fonts.googleapis.com/css2?family=WDXL+Lubrifont+SC&display=swap');
+
+.skill-match-font {
+    font-family: "WDXL Lubrifont SC", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  .animation-svg > svg path {
+    fill: transparent;
+    stroke: #ffffff;
+    stroke-width: .1;
+    stroke-dasharray: 50;
+    stroke-dashoffset: 50;
+    animation: dash 1s ease-in-out 1 forwards;
+  }
+
+  @keyframes dash {
+    to {
+      fill: #686868;
+      stroke-width: 1;
+      stroke-dashoffset: 0;
+    }
+  }
