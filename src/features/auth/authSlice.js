@@ -28,17 +28,22 @@ export const loginUser = createAsyncThunk(
     async (credentials, { rejectWithValue }) => {
         try {
             console.log('Attempting login with:', credentials);
-            const response = await apiService.post('/auth/login', credentials);
+            const response = await apiService.post('/api/auth/login', credentials);
             console.log('Login response:', response);
             
-            // Store token in localStorage
-            localStorage.setItem('authToken', response.token);
-            localStorage.setItem('user', JSON.stringify(response.user));
+            if (!response.data) {
+                throw new Error('No data received from server');
+            }
             
-            return response;
+            // Store token in localStorage
+            localStorage.setItem('authToken', response.data.token);
+            localStorage.setItem('user', JSON.stringify(response.data.user));
+            
+            return response.data;
         } catch (error) {
             console.error('Login error:', error);
-            return rejectWithValue(error.response?.data || 'Login failed');
+            const errorMessage = error.response?.data?.message || error.message || 'Login failed';
+            return rejectWithValue(errorMessage);
         }
     }
 );
