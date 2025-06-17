@@ -12,7 +12,7 @@
     stroke-width: .1;
     stroke-dasharray: 50;
     stroke-dashoffset: 50;
-    animation: dash 1s ease-in-out 1 forwards;
+    animation: dash 2s ease-in-out infinite;
   }
 
   @keyframes dash {

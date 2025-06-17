@@ -11,13 +11,6 @@ export default function Home() {
       <JobApplicationCards />
       <CompanyMarquee />
       <HiredMarquee />
-
-      <div className="relative text-[120px] text-red-700 font-bold w-fit leading-none">
-        <span className="text-transparent bg-clip-text striped">
-          Skill Match
-        </span>
-      </div>
-
       <Footer />
     </div>
   );
