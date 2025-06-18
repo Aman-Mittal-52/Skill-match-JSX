@@ -12,12 +12,11 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
-import { Building2 } from 'lucide-react';
-import { DropdownMenuDemo } from '../navbar/dropdown';
+import { ProfileDropDown } from '../navbar/ProfileDropDown';
 
 
 function ListItem({ title, description }) {
-  
+
   return (
     <li>
       <NavigationMenuLink asChild>
@@ -87,7 +86,7 @@ export default function Navbar() {
         {/* Left: Logo */}
         <Link to="/" className="text-xl font-bold text-gray-900 dark:text-white whitespace-nowrap">
           <div className="flex items-center gap-2 skill-match-font">
-          <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className='mr-2'><rect width="32" height="32" rx="6" fill="#000"/><path d="M8 16L16 8L24 16L16 24L8 16Z" fill="#fff"/></svg>
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className='mr-2'><rect width="32" height="32" rx="6" fill="#000" /><path d="M8 16L16 8L24 16L16 24L8 16Z" fill="#fff" /></svg>
             Skill Match
           </div>
         </Link>
@@ -101,9 +100,9 @@ export default function Navbar() {
             placeholder="Search jobs…"
             className="w-full h-9 bg-muted dark:bg-muted"
           />
-          <Button 
-            variant="outline" 
-            onClick={handleSearch} 
+          <Button
+            variant="outline"
+            onClick={handleSearch}
             className="h-9 px-4 dark:text-white"
           >
             Search
@@ -131,7 +130,7 @@ export default function Navbar() {
           </Button>
           <ThemeToggle />
           {isAuthenticated ? (
-          <DropdownMenuDemo/>
+            <ProfileDropDown />
           ) : (
             <Link to="/auth/login">
               <Button className="px-4 py-2 rounded-md">Login</Button>
@@ -149,9 +148,13 @@ export default function Navbar() {
           </Link>
           <div className="flex gap-3 items-center">
             <ThemeToggle />
-            <Link to="/auth/login">
-              <Button className="px-4 py-1">Login</Button>
-            </Link>
+            {isAuthenticated ? (
+              <ProfileDropDown />
+            ) : (
+              <Link to="/auth/login">
+                <Button className="px-4 py-1">Login</Button>
+              </Link>
+            )}
           </div>
         </div>
 

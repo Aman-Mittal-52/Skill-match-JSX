@@ -7,7 +7,7 @@ export const registerUser = createAsyncThunk(
     async (userData, { rejectWithValue }) => {
         try {
             console.log('Attempting registration with:', userData);
-            const response = await apiService.post('/auth/register', userData);
+            const response = await apiService.post('/api/auth/register', userData);
             console.log('Registration response:', response);
             
             // Store token in localStorage

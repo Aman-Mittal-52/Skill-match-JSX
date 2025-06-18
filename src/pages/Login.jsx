@@ -65,7 +65,7 @@ export function Login() {
             const result = await dispatch(loginUser(formData)).unwrap();
             toast.success("Login successful");
             console.log("Login successful:", result);
-            navigate('/dashboard');
+            navigate('/jobs');
         } catch (err) {
             console.error("Login failed:", err);
             // Handle different types of error messages

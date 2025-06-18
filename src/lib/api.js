@@ -45,7 +45,7 @@ api.interceptors.response.use(
         if (error.response?.status === 401) {
             // Handle unauthorized access
             localStorage.removeItem('authToken');
-            window.location.href = '/login';
+            window.location.href = '/auth/login';
         }
         
         return Promise.reject(error);
@@ -58,7 +58,7 @@ const apiService = {
     get: async (url, params = {}) => {
         try {
             const response = await api.get(url, { params });
-            return response.data;
+            return response;
         } catch (error) {
             console.error('GET Request Failed:', url, error);
             throw error;
@@ -69,7 +69,7 @@ const apiService = {
     post: async (url, data = {}) => {
         try {
             const response = await api.post(url, data);
-            return response.data;
+            return response;
         } catch (error) {
             console.error('POST Request Failed:', url, error);
             throw error;
@@ -80,7 +80,7 @@ const apiService = {
     put: async (url, data = {}) => {
         try {
             const response = await api.put(url, data);
-            return response.data;
+            return response;
         } catch (error) {
             console.error('PUT Request Failed:', url, error);
             throw error;
@@ -91,7 +91,7 @@ const apiService = {
     delete: async (url) => {
         try {
             const response = await api.delete(url);
-            return response.data;
+            return response;
         } catch (error) {
             console.error('DELETE Request Failed:', url, error);
             throw error;
@@ -102,7 +102,7 @@ const apiService = {
     patch: async (url, data = {}) => {
         try {
             const response = await api.patch(url, data);
-            return response.data;
+            return response;
         } catch (error) {
             console.error('PATCH Request Failed:', url, error);
             throw error;

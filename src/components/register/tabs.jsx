@@ -116,7 +116,7 @@ export function TabsComponent() {
       const result = await dispatch(registerUser(formData)).unwrap();
       toast.success("Registration successful");
       console.log("Registration successful:", result);
-      navigate('/dashboard');
+      navigate('/jobs');
     } catch (err) {
       console.error("Registration failed:", err);
       toast.error(err.message || "Registration failed");
@@ -162,7 +162,7 @@ export function TabsComponent() {
       const result = await dispatch(registerUser(recruiterData)).unwrap();
       toast.success("Registration successful");
       console.log("Registration successful:", result);
-      navigate('/dashboard');
+      navigate('/jobs');
     } catch (err) {
       console.error("Registration failed:", err);
       toast.error(err.message || "Registration failed");
