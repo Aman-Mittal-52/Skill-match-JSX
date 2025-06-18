@@ -370,13 +370,13 @@ export default function JobApplicationCards() {
           ) : null}
         </AnimatePresence>
 
-        <div className={`max-w-7xl mx-auto w-full grid gap-4 bg-background ${isTwoColumns ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'}`}>
+        <div className={`max-w-7xl mx-auto w-full grid gap-4  ${isTwoColumns ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'}`}>
           {jobsData.map((job, index) => (
             <motion.div
               layoutId={`card-${job.title}-${id}`}
               key={`card-${job.title}-${id}`}
               onClick={() => setActive(job)}
-              className="p-4 md:p-6 flex flex-col md:flex-row justify-between items-start md:items-center hover:bg-neutral-50 dark:hover:bg-neutral-800 rounded-xl cursor-pointer border border-neutral-200 dark:border-neutral-700 transition-colors"
+              className="bg-background p-4 md:p-6 flex flex-col md:flex-row justify-between items-start md:items-center hover:bg-neutral-50 dark:hover:bg-neutral-800 rounded-xl cursor-pointer border border-neutral-200 dark:border-neutral-700 transition-colors"
             >
               <div className="flex gap-3 md:gap-4 flex-col md:flex-row flex-1">
                 <motion.div layoutId={`image-${job.title}-${id}`}>
