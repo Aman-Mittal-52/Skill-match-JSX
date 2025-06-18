@@ -39,7 +39,7 @@ export function Login() {
     };
 
     const handleGoogleLogin = () => {
-        window.location.href = `${import.meta.env.VITE_BACKEND_URL}/auth/google`;
+        window.location.href = `${import.meta.env.VITE_BACKEND_URL}/api/auth/google`;
       };
 
     const handleSubmit = async (e) => {
