@@ -2,7 +2,6 @@ import React from 'react';
 
 function Footer() {
   // Debug: Render Footer component
-  console.log('Rendering Footer component');
 
   return (
     <div className='bg-accent rounded-t-3xl p-4 md:p-10 flex flex-col md:flex-row justify-between items-start w-full gap-8 md:gap-4'>

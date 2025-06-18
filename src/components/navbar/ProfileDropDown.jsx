@@ -14,11 +14,28 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { User } from "lucide-react"
-import { useSelector } from "react-redux"
+import { useSelector, useDispatch } from "react-redux"
+import { logout } from "@/features/auth/authSlice"
+import { useNavigate } from "react-router-dom"
+import { toast } from "sonner"
 
 export function ProfileDropDown() {
-
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
+
+  const handleLogout = () => {
+    console.log('Logging out user...'); // Debug log
+    try {
+      dispatch(logout());
+      toast.success(`Logged out successfully`);
+      navigate('/');
+    } catch (error) {
+      console.error('Logout error:', error); // Debug log
+      toast.error('Failed to logout');
+    }
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -57,8 +74,8 @@ export function ProfileDropDown() {
           <DropdownMenuSubTrigger>Log out</DropdownMenuSubTrigger>
           <DropdownMenuPortal>
             <DropdownMenuSubContent className='flex flex-col gap-1'>
-              <DropdownMenuItem className='bg-red-500 text-white flex justify-center'>Confirm</DropdownMenuItem>
-              <DropdownMenuItem className='flex justify-center' onClick={() => { console.log('hello') }}>Cancel</DropdownMenuItem>
+              <DropdownMenuItem className='bg-red-500 text-white flex justify-center' onClick={handleLogout}>Confirm</DropdownMenuItem>
+              <DropdownMenuItem className='flex justify-center'>Cancel</DropdownMenuItem>
             </DropdownMenuSubContent>
           </DropdownMenuPortal>
         </DropdownMenuSub>

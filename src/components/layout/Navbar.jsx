@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import ThemeToggle from '@/components/layout/ThemeToggle';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { searchJobs } from '@/features/jobs/jobsSlice';
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -13,6 +14,7 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 import { ProfileDropDown } from '../navbar/ProfileDropDown';
+import { toast } from 'sonner';
 
 
 function ListItem({ title, description }) {
@@ -32,13 +34,32 @@ function ListItem({ title, description }) {
 
 export default function Navbar() {
   const { isAuthenticated } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   // State for search functionality
   const [searchTerm, setSearchTerm] = useState('');
 
   // Handle search submission
-  const handleSearch = () => {
+  const handleSearch = async () => {
     console.log('Search initiated with term:', searchTerm); // Debug log
-    // TODO: Implement actual search functionality
+    
+    try {
+      if (!searchTerm.trim()) {
+        console.log('Empty search term, skipping search'); // Debug log
+        return;
+      }
+
+      console.log('Dispatching search action...'); // Debug log
+      const res = await dispatch(searchJobs(searchTerm.trim())).unwrap();
+      
+      console.log('Search results:', res); // Debug log
+      console.log('Navigating to search results page...'); // Debug log
+      navigate(`/jobs/search?query=${encodeURIComponent(searchTerm.trim())}`);
+      
+    } catch (error) {
+      console.error('Search operation failed:', error); // Debug log
+      toast.error('Failed to search jobs. Please try again.');
+    }
   };
 
   // Available job categories for navigation
@@ -53,7 +74,6 @@ export default function Navbar() {
 
   // Handle input change for search
   const handleInputChange = (e) => {
-    console.log('Search input changed:', e.target.value); // Debug log
     setSearchTerm(e.target.value);
   };
 
@@ -186,7 +206,7 @@ export default function Navbar() {
             onChange={handleInputChange}
             onKeyDown={handleKeyPress}
             placeholder="Search jobs…"
-            className="flex-grow h-9"
+            className="flex-grow h-9 dark:text-white"
           />
           <Button onClick={handleSearch} className="h-9 px-4">Search</Button>
         </div>

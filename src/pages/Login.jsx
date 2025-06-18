@@ -10,7 +10,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Link, useNavigate } from "react-router-dom"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { loginUser, clearError } from "@/features/auth/authSlice"
 import { toast } from "sonner"
@@ -37,6 +37,10 @@ export function Login() {
             dispatch(clearError());
         }
     };
+
+    const handleGoogleLogin = () => {
+        window.location.href = `${import.meta.env.VITE_BACKEND_URL}/auth/google`;
+      };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -73,6 +77,19 @@ export function Login() {
             toast.error(errorMessage);
         }
     };
+
+
+    useEffect(() => {
+      const params = new URLSearchParams(window.location.search);
+      const token  = params.get("token");
+      if (token) {
+        // 1) save it
+        localStorage.setItem("jwt", token);
+        // 2) clean URL & redirect
+        window.history.replaceState({}, "", "/jobs");
+        navigate("/jobs");
+      }
+    }, [navigate]);
 
     return (
         <>
@@ -155,7 +172,7 @@ export function Login() {
                                 </div>
                                 : 'Login'}
                         </Button>
-                        <Button variant="outline" className="w-full">
+                        <Button variant="outline" className="w-full" onClick={handleGoogleLogin}>
                             Login with Google
                         </Button>
                     </CardFooter>

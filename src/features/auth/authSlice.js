@@ -7,13 +7,13 @@ export const registerUser = createAsyncThunk(
     async (userData, { rejectWithValue }) => {
         try {
             console.log('Attempting registration with:', userData);
-            const response = await apiService.post('/api/auth/register', userData);
+            const response = await apiService.post('/auth/register', userData);
             console.log('Registration response:', response);
-            
+
             // Store token in localStorage
             localStorage.setItem('authToken', response.token);
             localStorage.setItem('user', JSON.stringify(response.user));
-            
+
             return response;
         } catch (error) {
             console.error('Registration error:', error);
@@ -28,22 +28,44 @@ export const loginUser = createAsyncThunk(
     async (credentials, { rejectWithValue }) => {
         try {
             console.log('Attempting login with:', credentials);
-            const response = await apiService.post('/api/auth/login', credentials);
+            const response = await apiService.post('/auth/login', credentials);
             console.log('Login response:', response);
-            
+
             if (!response.data) {
                 throw new Error('No data received from server');
             }
-            
+
             // Store token in localStorage
             localStorage.setItem('authToken', response.data.token);
             localStorage.setItem('user', JSON.stringify(response.data.user));
-            
+
             return response.data;
         } catch (error) {
             console.error('Login error:', error);
             const errorMessage = error.response?.data?.message || error.message || 'Login failed';
             return rejectWithValue(errorMessage);
+        }
+    }
+);
+
+// Async thunk for logout
+export const logoutUser = createAsyncThunk(
+    'auth/logout',
+    async (_, { rejectWithValue }) => {
+        try {
+            console.log('Attempting to logout...');
+            // You can add API call here if needed for server-side logout
+            // const response = await apiService.post('/auth/logout');
+
+            // Clear local storage
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('user');
+
+            console.log('Logout successful');
+            return true;
+        } catch (error) {
+            console.error('Logout error:', error);
+            return rejectWithValue(error.message || 'Logout failed');
         }
     }
 );
@@ -61,10 +83,15 @@ const authSlice = createSlice({
     initialState,
     reducers: {
         logout: (state) => {
+            console.log('Clearing auth state...');
             state.user = null;
             state.token = null;
             state.isAuthenticated = false;
+            state.loading = false;
+            state.error = null;
             localStorage.removeItem('authToken');
+            localStorage.removeItem('user');
+            console.log('Auth state cleared successfully');
         },
         clearError: (state) => {
             state.error = null;
@@ -99,6 +126,21 @@ const authSlice = createSlice({
                 state.token = action.payload.token;
             })
             .addCase(registerUser.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+            // Logout cases
+            .addCase(logoutUser.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(logoutUser.fulfilled, (state) => {
+                state.loading = false;
+                state.isAuthenticated = false;
+                state.user = null;
+                state.token = null;
+            })
+            .addCase(logoutUser.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             });

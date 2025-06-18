@@ -1,6 +1,5 @@
 export default function HeroSection() {
   // Add console log for debugging
-  console.log('Rendering HeroSection component');
 
   return (
     // Main container with responsive padding and flex layout
