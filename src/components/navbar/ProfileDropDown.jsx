@@ -13,7 +13,8 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { User } from "lucide-react"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { BadgeHelp, Briefcase, FileCheck2, Mail, Plus, Settings, User, UserCog } from "lucide-react"
 import { useSelector, useDispatch } from "react-redux"
 import { logout } from "@/features/auth/authSlice"
 import { useNavigate } from "react-router-dom"
@@ -37,49 +38,74 @@ export function ProfileDropDown() {
   };
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="rounded-full dark:text-accent-foreground">
-          <User className="w-4 h-4 mr-2" />
-          <span className="text-sm max-w-[120px] truncate">{user?.name}</span>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56 mr-5" align="start">
-        <DropdownMenuLabel>Account</DropdownMenuLabel>
-        <DropdownMenuSeparator/>
-        <DropdownMenuGroup>
-          <DropdownMenuItem>
-            Profile
-            <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
-          </DropdownMenuItem>
-          {
-            user && user.role == 'seeker' ?
-              null
-              :
-              <DropdownMenuItem>
-                Settings
-                <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
-              </DropdownMenuItem>
-          }
-          <DropdownMenuItem>
-            Settings
-            <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem>Support</DropdownMenuItem>
-        <DropdownMenuItem disabled>Github</DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuSub>
-          <DropdownMenuSubTrigger>Log out</DropdownMenuSubTrigger>
-          <DropdownMenuPortal>
-            <DropdownMenuSubContent className='flex flex-col gap-1'>
-              <DropdownMenuItem className='bg-red-500 text-white flex justify-center' onClick={handleLogout}>Confirm</DropdownMenuItem>
-              <DropdownMenuItem className='flex justify-center'>Cancel</DropdownMenuItem>
-            </DropdownMenuSubContent>
-          </DropdownMenuPortal>
-        </DropdownMenuSub>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <Dialog>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" className="rounded-full dark:text-accent-foreground">
+            <User className="w-4 h-4 mr-2" />
+            <span className="text-sm max-w-[120px] truncate">{user?.name}</span>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-56 mr-5" align="start">
+          <DropdownMenuLabel>
+            <div className="flex flex-col gap-2">
+              <div>Account</div>
+              <div className="text-muted-foreground">
+                {user?.email}
+              </div>
+            </div>
+
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuGroup>
+            <DropdownMenuItem>
+              <UserCog /> Profile
+              <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+            </DropdownMenuItem>
+            {
+              user && user.role == 'seeker' ?
+                <DropdownMenuItem onClick={() => navigate('/applications')}>
+                  <FileCheck2 /> Applied
+                </DropdownMenuItem>
+                :(
+                  <>
+                  <DropdownMenuItem onClick={() => navigate('/jobs/post')}>
+                  <Plus /> Post a job
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/jobs/posted')}>
+                  <Briefcase /> Posted jobs
+                </DropdownMenuItem>
+                </>
+                )
+            }
+            <DropdownMenuItem>
+              <Settings /> Settings
+              <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem><BadgeHelp />Support</DropdownMenuItem>
+          <DropdownMenuItem disabled>Github</DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DialogTrigger asChild>
+            <DropdownMenuItem>
+              Log out
+            </DropdownMenuItem>
+          </DialogTrigger>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Are you absolutely sure?</DialogTitle>
+          <DialogDescription>
+            This action cannot be undone. Are you sure you want to
+            logout from your account?
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button onClick={handleLogout}>Confirm</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }

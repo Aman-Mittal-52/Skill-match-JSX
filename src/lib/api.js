@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Create axios instance with default config
 const api = axios.create({
-    baseURL: `${import.meta.env.VITE_BACKEND_URL}/api` || 'https://skillmatch-2typ.onrender.com',
+    baseURL: `${import.meta.env.VITE_BACKEND_URL}/api`,
     timeout: 10000,
     headers: {
         'Content-Type': 'application/json',
@@ -45,7 +45,6 @@ api.interceptors.response.use(
         if (error.response?.status === 401) {
             // Handle unauthorized access
             localStorage.removeItem('authToken');
-            window.location.href = '/auth/login';
         }
         
         return Promise.reject(error);

@@ -70,12 +70,31 @@ export const logoutUser = createAsyncThunk(
     }
 );
 
+// Async thunk for fetching job details
+export const fetchJobDetails = createAsyncThunk(
+    'jobs/fetchJobDetails',
+    async (jobId, { rejectWithValue }) => {
+        try {
+            console.log('Fetching job details for ID:', jobId); // Debug log
+            const response = await apiService.get(`/jobs/${jobId}`);
+            console.log('Job details response:', response); // Debug log
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching job details:', error); // Debug log
+            return rejectWithValue(error.response?.data || 'Failed to fetch job details');
+        }
+    }
+);
+
 const initialState = {
     user: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null,
     token: localStorage.getItem('authToken'),
     isAuthenticated: localStorage.getItem('authToken') ? true : false,
     loading: false,
-    error: null
+    error: null,
+    currentJob: null, // Add this for storing current job details
+    jobLoading: false, // Add this for job loading state
+    jobError: null // Add this for job error state
 };
 
 const authSlice = createSlice({
@@ -95,6 +114,9 @@ const authSlice = createSlice({
         },
         clearError: (state) => {
             state.error = null;
+        },
+        clearJobError: (state) => {
+            state.jobError = null;
         }
     },
     extraReducers: (builder) => {
@@ -143,9 +165,22 @@ const authSlice = createSlice({
             .addCase(logoutUser.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
+            })
+            // Job details cases
+            .addCase(fetchJobDetails.pending, (state) => {
+                state.jobLoading = true;
+                state.jobError = null;
+            })
+            .addCase(fetchJobDetails.fulfilled, (state, action) => {
+                state.jobLoading = false;
+                state.currentJob = action.payload;
+            })
+            .addCase(fetchJobDetails.rejected, (state, action) => {
+                state.jobLoading = false;
+                state.jobError = action.payload;
             });
     }
 });
 
-export const { logout, clearError } = authSlice.actions;
+export const { logout, clearError, clearJobError } = authSlice.actions;
 export default authSlice.reducer; 
