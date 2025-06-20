@@ -90,19 +90,18 @@ export default function Navbar() {
       sticky top-4 left-0 right-0 z-50
       backdrop-blur-xl
       m-4
+      max-w-7xl
+      mx-auto
       border
       text-black
-      dark:border
-      border-white/10
       rounded-xl
       px-4
-      border-black
       py-3
       transition-all
       duration-300
     ">
       {/* === Desktop View === */}
-      <div className="hidden md:flex items-center justify-between max-w-7xl mx-auto gap-6">
+      <div className="hidden md:flex items-center justify-between max-w-6xl mx-auto gap-6">
         {/* Left: Logo */}
         <Link to="/" className="text-xl font-bold text-gray-900 dark:text-white whitespace-nowrap">
           <div className="flex items-center gap-2 skill-match-font">

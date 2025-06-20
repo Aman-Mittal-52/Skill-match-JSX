@@ -10,6 +10,7 @@ import {
   selectJobsStatus,
   selectJobsError,
   selectDeleteStatus,
+  selectToggleStatus,
 } from "@/features/jobs/jobsSlice";
 import {
   Card,
@@ -33,7 +34,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Captions, CaptionsOff, Pencil, Trash2 } from "lucide-react";
+import { Captions, CaptionsOff, Pencil, Trash2, Loader2 } from "lucide-react";
 import { BigLoader } from "@/components/ui/BigLoader";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
@@ -44,6 +45,7 @@ export default function PostedJobs() {
   const status = useSelector(selectJobsStatus);
   const error = useSelector(selectJobsError);
   const deleteStatus = useSelector(selectDeleteStatus);
+  const toggleStatus = useSelector(selectToggleStatus);
 
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -61,6 +63,7 @@ export default function PostedJobs() {
     tags: "",
     jobType: "full-time",
   });
+  const [togglingJobId, setTogglingJobId] = useState(null);
 
   useEffect(() => {
     dispatch(fetchPostedJobs());
@@ -140,14 +143,17 @@ export default function PostedJobs() {
 
   const handleJobStatusChange = async (jobId) => {
     try {
+      setTogglingJobId(jobId);
       await dispatch(toggleJobStatus(jobId)).unwrap();
       toast.success("Job status updated successfully");
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to update job status");
+    } finally {
+      setTogglingJobId(null);
     }
   };
 
-  if (status === "loading") {
+  if (status === "loading" && toggleStatus !== "loading") {
     return <BigLoader />;
   }
 
@@ -234,8 +240,14 @@ export default function PostedJobs() {
                   variant={job.status === "open" ? "outline" : "default"}
                   className="w-full"
                   onClick={() => handleJobStatusChange(job._id)}
+                  disabled={toggleStatus === "loading" && togglingJobId === job._id}
                 >
-                  {job.status === "open" ? (
+                  {toggleStatus === "loading" && togglingJobId === job._id ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Updating...
+                    </>
+                  ) : job.status === "open" ? (
                     <>
                       <CaptionsOff /> Close Job
                     </>

@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import apiService from '@/lib/api';
+import apiService from '@/utils/api';
 
 // Async thunk for fetching jobs
 export const fetchJobs = createAsyncThunk(
@@ -158,9 +158,64 @@ export const toggleJobStatus = createAsyncThunk(
     }
 );
 
+// Async thunk for fetching admin jobs
+export const fetchAdminJobs = createAsyncThunk(
+    'jobs/fetchAdminJobs',
+    async (_, { rejectWithValue }) => {
+        try {
+            console.log('Fetching admin jobs...');
+            const response = await apiService.get('/admin/jobs');
+            console.log('Admin jobs response:', response);
+            console.log('Admin jobs response.data:', response.data);
+            console.log('Admin jobs response.data.jobs:', response.data.jobs);
+            
+            // Handle the nested structure: response.data.jobs
+            const jobsData = response.data.jobs || response.data;
+            console.log('Final jobs data to be returned:', jobsData);
+            return jobsData;
+        } catch (error) {
+            console.error('Error fetching admin jobs:', error);
+            return rejectWithValue(error.response?.data || 'Failed to fetch admin jobs');
+        }
+    }
+);
+
+// Async thunk for admin to delete a job
+export const adminDeleteJob = createAsyncThunk(
+    'jobs/adminDeleteJob',
+    async (jobId, { rejectWithValue }) => {
+        try {
+            console.log('Admin deleting job:', jobId);
+            const response = await apiService.delete(`/admin/jobs/${jobId}`);
+            console.log('Job deleted successfully by admin:', response);
+            return jobId;
+        } catch (error) {
+            console.error('Error deleting job as admin:', error);
+            return rejectWithValue(error.response?.data || 'Failed to delete job');
+        }
+    }
+);
+
+// Async thunk for admin to update job status
+export const adminUpdateJobStatus = createAsyncThunk(
+    'jobs/adminUpdateJobStatus',
+    async ({ jobId, status }, { rejectWithValue }) => {
+        try {
+            console.log('Admin updating job status:', jobId, status);
+            const response = await apiService.put(`/admin/jobs/${jobId}`, { status });
+            console.log('Job status updated successfully by admin:', response);
+            return response.data;
+        } catch (error) {
+            console.error('Error updating job status as admin:', error);
+            return rejectWithValue(error.response?.data || 'Failed to update job status');
+        }
+    }
+);
+
 const initialState = {
     jobs: [],
     postedJobs: [], // Add posted jobs array
+    adminJobs: [], // Add admin jobs array
     status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
     error: null,
     applicationStatus: 'idle', // Track application status separately
@@ -169,6 +224,14 @@ const initialState = {
     postError: null,
     deleteStatus: 'idle', // Add delete status
     deleteError: null, // Add delete error
+    toggleStatus: 'idle', // Track toggle status separately
+    toggleError: null, // Track toggle error separately
+    adminJobsStatus: 'idle', // Track admin jobs status
+    adminJobsError: null, // Track admin jobs error
+    adminDeleteStatus: 'idle', // Track admin delete status
+    adminDeleteError: null, // Track admin delete error
+    adminUpdateStatus: 'idle', // Track admin update status
+    adminUpdateError: null, // Track admin update error
     filters: {
         searchQuery: '',
         jobType: 'all',
@@ -186,6 +249,18 @@ const jobsSlice = createSlice({
         },
         clearFilters: (state) => {
             state.filters = initialState.filters;
+        },
+        // Optimistic updates for admin actions
+        optimisticallyUpdateJobStatus: (state, action) => {
+            const { jobId, status } = action.payload;
+            const jobIndex = state.adminJobs.findIndex(job => job._id === jobId);
+            if (jobIndex !== -1) {
+                state.adminJobs[jobIndex].status = status;
+            }
+        },
+        optimisticallyDeleteJob: (state, action) => {
+            const jobId = action.payload;
+            state.adminJobs = state.adminJobs.filter(job => job._id !== jobId);
         }
     },
     extraReducers: (builder) => {
@@ -314,33 +389,89 @@ const jobsSlice = createSlice({
             // Handle toggleJobStatus cases
             .addCase(toggleJobStatus.pending, (state) => {
                 console.log('Toggling job status...');
-                state.status = 'loading';
-                state.error = null;
+                state.toggleStatus = 'loading';
+                state.toggleError = null;
             })
             .addCase(toggleJobStatus.fulfilled, (state, action) => {
                 console.log('Job status toggled successfully:', action.payload);
-                state.status = 'succeeded';
+                state.toggleStatus = 'succeeded';
                 // Update the specific job in postedJobs array
                 const index = state.postedJobs.findIndex(job => job._id === action.payload._id);
                 if (index !== -1) {
                     state.postedJobs[index] = action.payload;
                 }
-                state.error = null;
+                state.toggleError = null;
             })
             .addCase(toggleJobStatus.rejected, (state, action) => {
                 console.error('Failed to toggle job status:', action.payload);
-                state.status = 'failed';
-                state.error = action.payload;
+                state.toggleStatus = 'failed';
+                state.toggleError = action.payload;
+            })
+            // Handle fetchAdminJobs cases
+            .addCase(fetchAdminJobs.pending, (state) => {
+                console.log('Fetching admin jobs...');
+                state.adminJobsStatus = 'loading';
+                state.adminJobsError = null;
+            })
+            .addCase(fetchAdminJobs.fulfilled, (state, action) => {
+                console.log('Admin jobs fetched successfully:', action.payload);
+                state.adminJobsStatus = 'succeeded';
+                state.adminJobs = action.payload;
+                state.adminJobsError = null;
+            })
+            .addCase(fetchAdminJobs.rejected, (state, action) => {
+                console.error('Failed to fetch admin jobs:', action.payload);
+                state.adminJobsStatus = 'failed';
+                state.adminJobsError = action.payload;
+            })
+            // Handle adminDeleteJob cases
+            .addCase(adminDeleteJob.pending, (state) => {
+                console.log('Admin deleting job...');
+                state.adminDeleteStatus = 'loading';
+                state.adminDeleteError = null;
+            })
+            .addCase(adminDeleteJob.fulfilled, (state, action) => {
+                console.log('Job deleted successfully by admin:', action.payload);
+                state.adminDeleteStatus = 'succeeded';
+                state.adminDeleteError = null;
+                state.adminJobs = state.adminJobs.filter(job => job._id !== action.payload);
+            })
+            .addCase(adminDeleteJob.rejected, (state, action) => {
+                console.error('Failed to delete job as admin:', action.payload);
+                state.adminDeleteStatus = 'failed';
+                state.adminDeleteError = action.payload;
+            })
+            // Handle adminUpdateJobStatus cases
+            .addCase(adminUpdateJobStatus.pending, (state) => {
+                console.log('Admin updating job status...');
+                state.adminUpdateStatus = 'loading';
+                state.adminUpdateError = null;
+            })
+            .addCase(adminUpdateJobStatus.fulfilled, (state, action) => {
+                console.log('Job status updated successfully by admin:', action.payload);
+                state.adminUpdateStatus = 'succeeded';
+                // Update the specific job in adminJobs array
+                const index = state.adminJobs.findIndex(job => job._id === action.payload._id);
+                if (index !== -1) {
+                    state.adminJobs[index] = action.payload;
+                }
+                state.adminUpdateError = null;
+            })
+            .addCase(adminUpdateJobStatus.rejected, (state, action) => {
+                console.error('Failed to update job status as admin:', action.payload);
+                state.adminUpdateStatus = 'failed';
+                state.adminUpdateError = action.payload;
             });
     }
 });
 
 // Export actions
-export const { setFilters, clearFilters } = jobsSlice.actions;
+export const { setFilters, clearFilters, optimisticallyUpdateJobStatus, optimisticallyDeleteJob } = jobsSlice.actions;
 
 // Export selectors
 export const selectAllJobs = (state) => state.jobs.jobs;
 export const selectPostedJobs = (state) => state.jobs.postedJobs;
+export const selectAdminJobs = (state) => state.jobs.adminJobs;
 export const selectJobsStatus = (state) => state.jobs.status;
 export const selectJobsError = (state) => state.jobs.error;
 export const selectJobsFilters = (state) => state.jobs.filters;
@@ -350,6 +481,14 @@ export const selectPostStatus = (state) => state.jobs.postStatus;
 export const selectPostError = (state) => state.jobs.postError;
 export const selectDeleteStatus = (state) => state.jobs.deleteStatus;
 export const selectDeleteError = (state) => state.jobs.deleteError;
+export const selectToggleStatus = (state) => state.jobs.toggleStatus;
+export const selectToggleError = (state) => state.jobs.toggleError;
+export const selectAdminJobsStatus = (state) => state.jobs.adminJobsStatus;
+export const selectAdminJobsError = (state) => state.jobs.adminJobsError;
+export const selectAdminDeleteStatus = (state) => state.jobs.adminDeleteStatus;
+export const selectAdminDeleteError = (state) => state.jobs.adminDeleteError;
+export const selectAdminUpdateStatus = (state) => state.jobs.adminUpdateStatus;
+export const selectAdminUpdateError = (state) => state.jobs.adminUpdateError;
 
 // Export reducer
 export default jobsSlice.reducer; 

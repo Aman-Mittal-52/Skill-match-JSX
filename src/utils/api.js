@@ -65,9 +65,9 @@ const apiService = {
     },
 
     // POST request
-    post: async (url, data = {}) => {
+    post: async (url, data = {}, config = {}) => {
         try {
-            const response = await api.post(url, data);
+            const response = await api.post(url, data, config);
             return response;
         } catch (error) {
             console.error('POST Request Failed:', url, error);
@@ -87,9 +87,9 @@ const apiService = {
     },
 
     // DELETE request
-    delete: async (url) => {
+    delete: async (url, data = {}) => {
         try {
-            const response = await api.delete(url);
+            const response = await api.delete(url, { data });
             return response;
         } catch (error) {
             console.error('DELETE Request Failed:', url, error);

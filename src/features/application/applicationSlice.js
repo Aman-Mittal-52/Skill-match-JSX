@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import apiService from '@/lib/api';
+import apiService from '@/utils/api';
 
 // Async thunk to fetch current user's applications
 export const fetchUserApplications = createAsyncThunk(

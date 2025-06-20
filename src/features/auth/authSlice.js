@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import apiService from '@/lib/api';
+import apiService from '@/utils/api';
 
 // Async thunk for registration
 export const registerUser = createAsyncThunk(
