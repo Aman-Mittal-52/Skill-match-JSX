@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import {
   fetchPostedJobs,
   deleteJob,
+  updateJob,
+  toggleJobStatus,
   selectPostedJobs,
   selectJobsStatus,
   selectJobsError,
@@ -31,9 +33,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Pencil, Trash2 } from "lucide-react";
+import { Captions, CaptionsOff, Pencil, Trash2 } from "lucide-react";
 import { BigLoader } from "@/components/ui/BigLoader";
-import apiService from "@/lib/api";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 export default function PostedJobs() {
   const dispatch = useDispatch();
@@ -128,12 +130,20 @@ export default function PostedJobs() {
         tags: editFormData.tags ? editFormData.tags.split(",").map((tag) => tag.trim()) : [],
       };
 
-      const response = await apiService.put(`/jobs/${selectedJob._id}`, jobData);
+      await dispatch(updateJob({ jobId: selectedJob._id, jobData })).unwrap();
       toast.success("Job updated successfully");
       setIsEditDialogOpen(false);
-      dispatch(fetchPostedJobs()); // Refresh the jobs list
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to update job");
+    }
+  };
+
+  const handleJobStatusChange = async (jobId) => {
+    try {
+      await dispatch(toggleJobStatus(jobId)).unwrap();
+      toast.success("Job status updated successfully");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to update job status");
     }
   };
 
@@ -172,12 +182,14 @@ export default function PostedJobs() {
                     <CardTitle className="text-lg sm:text-xl truncate">{job.title}</CardTitle>
                     <CardDescription className="truncate">{job.companyName}</CardDescription>
                   </div>
-                  <Badge
-                    variant={job.status === "open" ? "default" : "secondary"}
-                    className="shrink-0"
-                  >
-                    {job.status}
-                  </Badge>
+                  
+                      <Badge
+                        variant={job.status === "open" ? "default" : "secondary"}
+                        className="shrink-0"
+                      >
+                        {job.status}
+                      </Badge>
+
                 </div>
               </CardHeader>
               <CardContent className="p-4 sm:p-6 pt-0 flex-grow">
@@ -210,26 +222,50 @@ export default function PostedJobs() {
                   </div>
                 </div>
               </CardContent>
-              <CardFooter className="p-4 sm:p-6 pt-0 flex justify-between gap-2">
+              <CardFooter className="p-4 sm:p-6 pt-0 flex flex-col gap-3">
                 <Button
                   variant="outline"
-                  size="sm"
-                  onClick={() => handleEdit(job)}
-                  className="flex-1"
+                  className="w-full"
+                  onClick={() => navigate(`/jobs/${job._id}/applications`)}
                 >
-                  <Pencil className="w-4 h-4 mr-2" />
-                  Edit
+                  View Applications
                 </Button>
                 <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => handleDelete(job._id)}
-                  disabled={deleteStatus === "loading"}
-                  className="flex-1"
+                  variant={job.status === "open" ? "outline" : "default"}
+                  className="w-full"
+                  onClick={() => handleJobStatusChange(job._id)}
                 >
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  Delete
+                  {job.status === "open" ? (
+                    <>
+                      <CaptionsOff /> Close Job
+                    </>
+                  ) : (
+                    <>
+                      <Captions /> Open Job
+                    </>
+                  )}
                 </Button>
+                <div className="flex gap-2 w-full">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleEdit(job)}
+                    className="flex-1"
+                  >
+                    <Pencil className="w-4 h-4 mr-2" />
+                    Edit
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => handleDelete(job._id)}
+                    disabled={deleteStatus === "loading"}
+                    className="flex-1"
+                  >
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Delete
+                  </Button>
+                </div>
               </CardFooter>
             </Card>
           ))}

@@ -51,9 +51,21 @@ export const applyToJob = createAsyncThunk(
                 phone
             });
             console.log('Application submitted successfully:', response);
+
+            // Check if the response indicates already applied
+            if (response.data && response.data.message === 'You have already applied to this job') {
+                return rejectWithValue(`${user.name} has already applied to this job`);
+            }
+
             return response.data;
         } catch (error) {
             console.error('Error applying to job:', error);
+            
+            // Handle the case where the API returns a 400 with "already applied" message
+            if (error.response && error.response.status === 400 && error.response.data && error.response.data.message === 'already applied') {
+                return rejectWithValue('You have already applied to this job');
+            }
+            
             return rejectWithValue(error.response?.data || 'Failed to apply to job');
         }
     }
@@ -103,6 +115,45 @@ export const deleteJob = createAsyncThunk(
         } catch (error) {
             console.error('Error deleting job:', error);
             return rejectWithValue(error.response?.data || 'Failed to delete job');
+        }
+    }
+);
+
+// Async thunk for updating a job
+export const updateJob = createAsyncThunk(
+    'jobs/updateJob',
+    async ({ jobId, jobData }, { rejectWithValue }) => {
+        try {
+            console.log('Updating job:', jobId, jobData);
+            const response = await apiService.put(`/jobs/${jobId}`, jobData);
+            console.log('Job updated successfully:', response);
+            return response.data;
+        } catch (error) {
+            console.error('Error updating job:', error);
+            return rejectWithValue(error.response?.data || 'Failed to update job');
+        }
+    }
+);
+
+// Async thunk for toggling job status
+export const toggleJobStatus = createAsyncThunk(
+    'jobs/toggleJobStatus',
+    async (jobId, { rejectWithValue, getState }) => {
+        try {
+            console.log('Toggling job status:', jobId);
+            const state = getState();
+            const job = state.jobs.postedJobs.find(j => j._id === jobId);
+            if (!job) {
+                return rejectWithValue('Job not found');
+            }
+            
+            const newStatus = job.status === 'open' ? 'closed' : 'open';
+            const response = await apiService.put(`/jobs/${jobId}`, { status: newStatus });
+            console.log('Job status toggled successfully:', response);
+            return response.data;
+        } catch (error) {
+            console.error('Error toggling job status:', error);
+            return rejectWithValue(error.response?.data || 'Failed to toggle job status');
         }
     }
 );
@@ -185,7 +236,6 @@ const jobsSlice = createSlice({
                 state.applicationError = null;
             })
             .addCase(applyToJob.rejected, (state, action) => {
-                console.error('Failed to submit application:', action.payload);
                 state.applicationStatus = 'failed';
                 state.applicationError = action.payload;
             })
@@ -239,6 +289,48 @@ const jobsSlice = createSlice({
                 console.error('Failed to delete job:', action.payload);
                 state.deleteStatus = 'failed';
                 state.deleteError = action.payload;
+            })
+            // Handle updateJob cases
+            .addCase(updateJob.pending, (state) => {
+                console.log('Updating job...');
+                state.status = 'loading';
+                state.error = null;
+            })
+            .addCase(updateJob.fulfilled, (state, action) => {
+                console.log('Job updated successfully:', action.payload);
+                state.status = 'succeeded';
+                // Update the specific job in postedJobs array
+                const index = state.postedJobs.findIndex(job => job._id === action.payload._id);
+                if (index !== -1) {
+                    state.postedJobs[index] = action.payload;
+                }
+                state.error = null;
+            })
+            .addCase(updateJob.rejected, (state, action) => {
+                console.error('Failed to update job:', action.payload);
+                state.status = 'failed';
+                state.error = action.payload;
+            })
+            // Handle toggleJobStatus cases
+            .addCase(toggleJobStatus.pending, (state) => {
+                console.log('Toggling job status...');
+                state.status = 'loading';
+                state.error = null;
+            })
+            .addCase(toggleJobStatus.fulfilled, (state, action) => {
+                console.log('Job status toggled successfully:', action.payload);
+                state.status = 'succeeded';
+                // Update the specific job in postedJobs array
+                const index = state.postedJobs.findIndex(job => job._id === action.payload._id);
+                if (index !== -1) {
+                    state.postedJobs[index] = action.payload;
+                }
+                state.error = null;
+            })
+            .addCase(toggleJobStatus.rejected, (state, action) => {
+                console.error('Failed to toggle job status:', action.payload);
+                state.status = 'failed';
+                state.error = action.payload;
             });
     }
 });

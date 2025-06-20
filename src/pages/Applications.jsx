@@ -40,7 +40,14 @@ export function Applications() {
     }
 
     if (status === 'failed') {
-        return <div>Error: {error}</div>
+        return (
+            <div className="container mx-auto px-4 py-8">
+                <div className="text-center text-red-600">
+                    <h2 className="text-xl font-semibold">Error loading applications</h2>
+                    <p>{error}</p>
+                </div>
+            </div>
+        );
     }
 
     return (
