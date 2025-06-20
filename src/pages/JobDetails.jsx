@@ -6,7 +6,7 @@ import { applyToJob, selectApplicationStatus, selectApplicationError } from '@/f
 import { toast } from 'sonner';
 import { Loader } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { MapPin, Briefcase, DollarSign, Tag, User, Phone } from 'lucide-react';
+import { MapPin, Briefcase, IndianRupee, Tag, User, Phone } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button';
 import apiService from '@/utils/api';
@@ -119,7 +119,7 @@ export function JobDetails() {
                                         <span className="text-sm sm:text-base">{currentJob.jobType.charAt(0).toUpperCase() + currentJob.jobType.slice(1)}</span>
                                     </div>
                                     <div className="flex items-center text-gray-600">
-                                        <DollarSign className="h-5 w-5 mr-2" />
+                                        <IndianRupee className="h-5 w-5 mr-2" />
                                         <span className="text-sm sm:text-base">{currentJob.salary}</span>
                                     </div>
                                 </div>
@@ -248,7 +248,7 @@ export function JobDetails() {
                                                         <span className="text-sm">{job.jobType}</span>
                                                     </div>
                                                     <div className="flex items-center text-gray-600">
-                                                        <DollarSign className="h-4 w-4 mr-2" />
+                                                        <IndianRupee className="h-4 w-4 mr-2" />
                                                         <span className="text-sm">{job.salary}</span>
                                                     </div>
                                                 </div>

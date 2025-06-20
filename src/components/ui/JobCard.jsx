@@ -1,4 +1,4 @@
-import { Briefcase, Clock, MapPin, DollarSign, Tag, User, Phone } from "lucide-react";
+import { Briefcase, Clock, MapPin, IndianRupee, Tag, User, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -46,7 +46,7 @@ export function JobCard({ job, onCardClick, onWhatsAppClick }) {
             {job.jobType.charAt(0).toUpperCase() + job.jobType.slice(1)}
           </div>
           <div className="flex items-center text-gray-600">
-            <DollarSign className="h-4 w-4 mr-2" />
+            <IndianRupee className="h-4 w-4 mr-2" />
             {job.salary}
           </div>
           {job.tags && job.tags.length > 0 && (

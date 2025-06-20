@@ -2,6 +2,8 @@ import { useEffect, useId, useRef, useState } from "react"
 import { AnimatePresence, motion } from "motion/react"
 import { useOutsideClick } from "@/hooks/use-outside-click"
 import { BriefcaseBusiness, LayoutGrid, LayoutList } from "lucide-react"
+import { useDispatch, useSelector } from "react-redux"
+import { fetchJobs, selectAllJobs, selectJobsStatus, selectJobsError } from "@/features/jobs/jobsSlice"
 
 // Job images for job listings
 const jobimages = [
@@ -12,207 +14,75 @@ const jobimages = [
   "https://images.unsplash.com/photo-1590608897129-79da98d159d4?w=400&h=400&fit=crop&crop=center"
 ];
 
-const jobsData = [
-  {
-    title: "Part-Time React Developer",
-    location: "Remote",
-    description: "Remote • Part-time",
-    company: "CodeFlex",
-    salary: "$40/hr - $60/hr",
-    logo: jobimages[0],
-    ctaText: "Apply Now",
-    ctaLink: "https://example.com/apply",
-    content: () => {
-      return (
-        <div className="space-y-4">
-          <div>
-            <h4 className="font-semibold text-neutral-800 dark:text-neutral-200 mb-2">Job Description</h4>
-            <p className="text-sm">
-              Seeking a part-time React developer to assist with building new features and maintaining an existing frontend application.
-            </p>
-          </div>
-          <div>
-            <h4 className="font-semibold text-neutral-800 dark:text-neutral-200 mb-2">Requirements</h4>
-            <ul className="text-sm space-y-1 list-disc list-inside">
-              <li>2+ years of React experience</li>
-              <li>Basic knowledge of TypeScript</li>
-              <li>Responsive UI development</li>
-              <li>Comfortable with Git and GitHub</li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="font-semibold text-neutral-800 dark:text-neutral-200 mb-2">Benefits</h4>
-            <ul className="text-sm space-y-1 list-disc list-inside">
-              <li>Work from anywhere</li>
-              <li>Flexible hours</li>
-              <li>Weekly payouts</li>
-              <li>Collaborative team</li>
-            </ul>
-          </div>
-        </div>
-      );
-    },
-  },
-  {
-    title: "Freelance UI/UX Designer",
-    location: "Remote",
-    description: "Remote • Part-time",
-    company: "DesignLoop",
-    salary: "$30/hr - $50/hr",
-    logo: jobimages[1],
-    ctaText: "Apply Now",
-    ctaLink: "https://example.com/apply",
-    content: () => {
-      return (
-        <div className="space-y-4">
-          <div>
-            <h4 className="font-semibold text-neutral-800 dark:text-neutral-200 mb-2">Job Description</h4>
-            <p className="text-sm">
-              Looking for a freelance UI/UX designer to help revamp the mobile interface of our e-commerce platform.
-            </p>
-          </div>
-          <div>
-            <h4 className="font-semibold text-neutral-800 dark:text-neutral-200 mb-2">Requirements</h4>
-            <ul className="text-sm space-y-1 list-disc list-inside">
-              <li>Experience with Figma or Adobe XD</li>
-              <li>Strong understanding of mobile-first design</li>
-              <li>Portfolio of previous mobile UI work</li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="font-semibold text-neutral-800 dark:text-neutral-200 mb-2">Benefits</h4>
-            <ul className="text-sm space-y-1 list-disc list-inside">
-              <li>Remote contract work</li>
-              <li>Flexible hours</li>
-              <li>Potential for recurring projects</li>
-            </ul>
-          </div>
-        </div>
-      );
-    },
-  },
-  {
-    title: "Junior QA Tester (Part-Time)",
-    location: "Bangalore, India",
-    description: "Hybrid • Part-time",
-    company: "Testify Co.",
-    salary: "$20/hr - $35/hr",
-    logo: jobimages[2],
-    ctaText: "Apply Now",
-    ctaLink: "https://example.com/apply",
-    content: () => {
-      return (
-        <div className="space-y-4">
-          <div>
-            <h4 className="font-semibold text-neutral-800 dark:text-neutral-200 mb-2">Job Description</h4>
-            <p className="text-sm">
-              Support our QA team with manual testing tasks and test case documentation.
-            </p>
-          </div>
-          <div>
-            <h4 className="font-semibold text-neutral-800 dark:text-neutral-200 mb-2">Requirements</h4>
-            <ul className="text-sm space-y-1 list-disc list-inside">
-              <li>Good communication skills</li>
-              <li>Detail-oriented mindset</li>
-              <li>Basic understanding of QA practices</li>
-              <li>Availability during IST evening hours</li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="font-semibold text-neutral-800 dark:text-neutral-200 mb-2">Benefits</h4>
-            <ul className="text-sm space-y-1 list-disc list-inside">
-              <li>Mentorship and guidance</li>
-              <li>Performance bonuses</li>
-              <li>Remote option available</li>
-            </ul>
-          </div>
-        </div>
-      );
-    },
-  },
-  {
-    title: "Part-Time WordPress Developer",
-    location: "Remote",
-    description: "Remote • Freelance",
-    company: "WP Wizards",
-    salary: "$25/hr - $45/hr",
-    logo: jobimages[3],
-    ctaText: "Apply Now",
-    ctaLink: "https://example.com/apply",
-    content: () => {
-      return (
-        <div className="space-y-4">
-          <div>
-            <h4 className="font-semibold text-neutral-800 dark:text-neutral-200 mb-2">Job Description</h4>
-            <p className="text-sm">
-              Maintain and enhance client WordPress sites. Should be comfortable with themes and custom plugins.
-            </p>
-          </div>
-          <div>
-            <h4 className="font-semibold text-neutral-800 dark:text-neutral-200 mb-2">Requirements</h4>
-            <ul className="text-sm space-y-1 list-disc list-inside">
-              <li>Experience with WordPress & WooCommerce</li>
-              <li>Knowledge of PHP and JavaScript</li>
-              <li>Ability to work independently</li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="font-semibold text-neutral-800 dark:text-neutral-200 mb-2">Benefits</h4>
-            <ul className="text-sm space-y-1 list-disc list-inside">
-              <li>Project-based payments</li>
-              <li>Flexible schedule</li>
-              <li>Fully remote work</li>
-            </ul>
-          </div>
-        </div>
-      );
-    },
-  },
-  {
-    title: "Tech Support Executive (Evenings)",
-    location: "Mumbai, India",
-    description: "On-site • Part-time",
-    company: "HelpTech Solutions",
-    salary: "$18/hr - $25/hr",
-    logo: jobimages[4],
-    ctaText: "Apply Now",
-    ctaLink: "https://example.com/apply",
-    content: () => {
-      return (
-        <div className="space-y-4">
-          <div>
-            <h4 className="font-semibold text-neutral-800 dark:text-neutral-200 mb-2">Job Description</h4>
-            <p className="text-sm">
-              Provide customer support and technical troubleshooting over chat and phone during evening hours.
-            </p>
-          </div>
-          <div>
-            <h4 className="font-semibold text-neutral-800 dark:text-neutral-200 mb-2">Requirements</h4>
-            <ul className="text-sm space-y-1 list-disc list-inside">
-              <li>Strong communication in English and Hindi</li>
-              <li>Customer-first mindset</li>
-              <li>Basic tech troubleshooting skills</li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="font-semibold text-neutral-800 dark:text-neutral-200 mb-2">Benefits</h4>
-            <ul className="text-sm space-y-1 list-disc list-inside">
-              <li>On-site refreshments and travel support</li>
-              <li>Evening shift allowance</li>
-              <li>Weekly incentives</li>
-            </ul>
-          </div>
-        </div>
-      );
-    },
-  },
-];
-
 export default function JobApplicationCards() {
   const [active, setActive] = useState(null)
   const [isTwoColumns, setIsTwoColumns] = useState(true)
   const ref = useRef(null)
   const id = useId()
+  
+  // Redux hooks
+  const dispatch = useDispatch()
+  const jobs = useSelector(selectAllJobs)
+  const jobsStatus = useSelector(selectJobsStatus)
+  const jobsError = useSelector(selectJobsError)
+
+  // Fetch jobs on component mount
+  useEffect(() => {
+    if (jobsStatus === 'idle') {
+      dispatch(fetchJobs())
+    }
+  }, [dispatch, jobsStatus])
+
+  // Transform API data to component format and limit to 6 jobs
+  const transformedJobs = jobs.slice(0, 6).map((job, index) => ({
+    title: job.title,
+    location: job.location,
+    description: `${job.jobType} • ${job.description}`,
+    company: job.companyName,
+    salary: job.salary,
+    logo: jobimages[index % jobimages.length], // Cycle through images
+    ctaText: "Apply Now",
+    ctaLink: "#",
+    whatsappNumber: job.whatsappNumber,
+    contactName: job.contactName,
+    mobileNumber: job.mobileNumber,
+    tags: job.tags,
+    content: () => {
+      return (
+        <div className="space-y-4">
+          <div>
+            <h4 className="font-semibold text-neutral-800 dark:text-neutral-200 mb-2">Job Description</h4>
+            <p className="text-sm">
+              {job.description}
+            </p>
+          </div>
+          <div>
+            <h4 className="font-semibold text-neutral-800 dark:text-neutral-200 mb-2">Job Details</h4>
+            <ul className="text-sm space-y-1">
+              <li><strong>Company:</strong> {job.companyName}</li>
+              <li><strong>Location:</strong> {job.location}</li>
+              <li><strong>Job Type:</strong> {job.jobType}</li>
+              <li><strong>Salary:</strong> {job.salary}</li>
+              <li><strong>Contact:</strong> {job.contactName}</li>
+              <li><strong>Phone:</strong> {job.mobileNumber}</li>
+            </ul>
+          </div>
+          {job.tags && job.tags.length > 0 && (
+            <div>
+              <h4 className="font-semibold text-neutral-800 dark:text-neutral-200 mb-2">Tags</h4>
+              <div className="flex flex-wrap gap-2">
+                {job.tags.map((tag, tagIndex) => (
+                  <span key={tagIndex} className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs rounded-full">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    },
+  }))
 
   useEffect(() => {
     function onKeyDown(event) {
@@ -232,6 +102,39 @@ export default function JobApplicationCards() {
   }, [active])
 
   useOutsideClick(ref, () => setActive(null))
+
+  // Loading state
+  if (jobsStatus === 'loading') {
+    return (
+      <div className="py-8">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-neutral-600 dark:text-neutral-400">Loading jobs...</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Error state
+  if (jobsStatus === 'failed') {
+    return (
+      <div className="py-8">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="text-center">
+            <p className="text-red-600 dark:text-red-400">Error loading jobs: {jobsError}</p>
+            <button 
+              onClick={() => dispatch(fetchJobs())}
+              className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="py-8">
@@ -326,7 +229,7 @@ export default function JobApplicationCards() {
                       <p className="text-xs md:text-sm text-neutral-500 dark:text-neutral-500">{active.description}</p>
                     </div>
 
-                    <div className="flex flex-col md:flex-row gap-2 w-full md:w-auto">
+                    <div className="flex flex-col gap-2 w-full md:w-auto">
                       <motion.a
                         layoutId={`button-${active.title}-${id}`}
                         href={active.ctaLink}
@@ -341,7 +244,7 @@ export default function JobApplicationCards() {
                         onClick={(e) => {
                           e.stopPropagation();
                           const message = `Hi, I'm interested in the ${active.title} position at ${active.company}`;
-                          const whatsappUrl = `https://wa.me/918287080461?text=${encodeURIComponent(message)}`;
+                          const whatsappUrl = `https://wa.me/${active.whatsappNumber || '918287080461'}?text=${encodeURIComponent(message)}`;
                           window.open(whatsappUrl, '_blank');
                         }}
                       >
@@ -371,7 +274,7 @@ export default function JobApplicationCards() {
         </AnimatePresence>
 
         <div className={`max-w-7xl mx-auto w-full grid gap-4  ${isTwoColumns ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'}`}>
-          {jobsData.map((job, index) => (
+          {transformedJobs.map((job, index) => (
             <motion.div
               layoutId={`card-${job.title}-${id}`}
               key={`card-${job.title}-${id}`}
@@ -402,7 +305,7 @@ export default function JobApplicationCards() {
                   </p>
                 </div>
               </div>
-              <div className="flex gap-2 mt-3 md:mt-0 w-full md:w-auto">
+              <div className="flex flex-col m-5  gap-2 mt-3 md:mt-0 w-full md:w-auto">
                 <motion.button
                   layoutId={`button-${job.title}-${id}`}
                   className="flex-1 md:flex-none px-4 md:px-6 py-2 text-xs md:text-sm rounded-full font-medium bg-neutral-100 hover:bg-blue-600 hover:text-white text-neutral-700 transition-colors"
@@ -414,7 +317,7 @@ export default function JobApplicationCards() {
                   onClick={(e) => {
                     e.stopPropagation();
                     const message = `Hi, I'm interested in the ${job.title} position at ${job.company}`;
-                    const whatsappUrl = `https://wa.me/918287080461?text=${encodeURIComponent(message)}`;
+                    const whatsappUrl = `https://wa.me/${job.whatsappNumber || '918287080461'}?text=${encodeURIComponent(message)}`;
                     window.open(whatsappUrl, '_blank');
                   }}
                 >

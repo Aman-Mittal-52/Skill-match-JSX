@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Search, Trash2, Eye, Edit, MoreHorizontal, Filter, Calendar, Building, MapPin, DollarSign, User, Phone, Mail } from "lucide-react";
+import { Search, Trash2, Eye, Edit, MoreHorizontal, Filter, Calendar, Building, MapPin, IndianRupee, User, Phone, Mail } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -393,7 +393,7 @@ const AdminJobs = () => {
                   {job.location}
                 </div>
                 <div className="flex items-center text-sm text-gray-600">
-                  <DollarSign className="mr-2 h-4 w-4" />
+                  <IndianRupee className="mr-2 h-4 w-4" />
                   {job.salary}
                 </div>
                 <div className="flex items-center text-sm text-gray-600">

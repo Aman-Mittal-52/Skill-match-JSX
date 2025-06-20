@@ -24,7 +24,6 @@ export default function Home() {
       <JobApplicationCards />
       <CompanyMarquee />
       <HiredMarquee />
-      <Footer />
     </div>
   );
 }

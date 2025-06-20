@@ -118,6 +118,16 @@ export default function LogoMarquee() {
 
   return (
     <div className="w-full overflow-hidden py-12">
+      {/* Title Section */}
+      <div className="text-center mb-8">
+        <h2 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-gray-200 mb-2">
+          Trusted by Leading Companies
+        </h2>
+        <p className="text-gray-600 dark:text-gray-400 text-sm md:text-base">
+          Join thousands of professionals who found their dream jobs through our platform
+        </p>
+      </div>
+
       {/* Top row: scroll left */}
       <div className="relative mb-8">
         <div className="flex animate-scroll-left">
