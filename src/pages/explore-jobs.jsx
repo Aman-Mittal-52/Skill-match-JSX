@@ -13,7 +13,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { fetchJobs, selectAllJobs, selectJobsStatus, selectJobsError, setFilters } from "@/features/jobs/jobsSlice";
 import { BigLoader } from "@/components/ui/BigLoader";
-import LogoMarquee from "@/components/home/LogosMarquee";
 
 export function ExploreJobs() {
   const dispatch = useDispatch();
@@ -148,11 +147,6 @@ export function ExploreJobs() {
             <SelectItem value="remote">Remote</SelectItem>
           </SelectContent>
         </Select>
-      </div>
-
-      {/* Trusted Companies Section */}
-      <div className="mb-12">
-        <LogoMarquee />
       </div>
 
       {/* Jobs Grid */}
