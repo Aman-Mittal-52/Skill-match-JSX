@@ -244,7 +244,7 @@ export default function JobApplicationCards() {
                         onClick={(e) => {
                           e.stopPropagation();
                           const message = `Hi, I'm interested in the ${active.title} position at ${active.company}`;
-                          const whatsappUrl = `https://wa.me/${active.whatsappNumber || '918287080461'}?text=${encodeURIComponent(message)}`;
+                          const whatsappUrl = `https://wa.me/${active.whatsappNumber || '919826000000'}?text=${encodeURIComponent(message)}`;
                           window.open(whatsappUrl, '_blank');
                         }}
                       >
@@ -317,7 +317,7 @@ export default function JobApplicationCards() {
                   onClick={(e) => {
                     e.stopPropagation();
                     const message = `Hi, I'm interested in the ${job.title} position at ${job.company}`;
-                    const whatsappUrl = `https://wa.me/${job.whatsappNumber || '918287080461'}?text=${encodeURIComponent(message)}`;
+                    const whatsappUrl = `https://wa.me/${job.whatsappNumber || '919826000000'}?text=${encodeURIComponent(message)}`;
                     window.open(whatsappUrl, '_blank');
                   }}
                 >
