@@ -5,7 +5,7 @@ export default function PrivateRoute({ children, requiredRole }) {
   const { user, isAuthenticated } = useSelector((state) => state.auth);
 
   if (!isAuthenticated) {
-    return <Navigate to="/auth/login" />;
+    return <Navigate to="/a" />;
   }
 
   if (requiredRole && user?.role !== requiredRole && user?.role !== 'admin') {
